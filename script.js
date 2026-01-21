@@ -1,5 +1,6 @@
 const libraryURL = "https://striveschool-api.herokuapp.com/books";
 const bookContainer = document.getElementById("cardsContainer");
+const dropdownMenu = document.getElementById("dropdownMenu");
 
 const getBooks = () => {
   fetch(libraryURL)
@@ -20,7 +21,7 @@ const getBooks = () => {
 
         bookContainer.innerHTML += `
         <div id="${bookAsin}" class="card col-12 col-md-6 col-lg-3 col-xxl-2 p-0">
-          <img src="${bookCover}" class="card-img-top" alt="" />
+          <img src="${bookCover}" class="card-img-top" alt="book_cover" />
           <div class="card-body d-flex flex-column justify-content-between">
             <div>
                 <p class="card-title">${bookTitle}</p>
@@ -44,10 +45,77 @@ getBooks();
 
 bookContainer.addEventListener("click", (e) => {
   const btnDelete = e.target.closest(".btnDelete");
-  const card = btnDelete.closest(".card");
+
   if (!btnDelete) {
     return;
   } else {
+    const card = btnDelete.closest(".card");
+    card.classList.add("d-none");
+  }
+});
+
+// DROPDOWN CART
+
+const LOCALSTORAGE_KEY = "cart-books";
+
+let cart = [];
+
+if (localStorage.getItem(LOCALSTORAGE_KEY) !== null) {
+  const savedCart = localStorage.getItem(LOCALSTORAGE_KEY);
+  cart = JSON.parse(savedCart);
+} else {
+  cart = [];
+}
+
+const showCart = () => {
+  dropdownMenu.innerHTML = "";
+  for (let i = 0; i < cart.length; i++) {
+    const book = cart[i];
+    dropdownMenu.innerHTML += `
+            <li class="dropdown-item container bookCart">
+            <button type="button" class="btnDelete btn btn-danger"><i class="fa-solid fa-trash-can"></i></button>
+            <img style="width: 50px" src="${book.img}" alt="book_cover" />
+            ${book.title}
+            </li>
+            `;
+  }
+};
+showCart();
+
+bookContainer.addEventListener("click", (e) => {
+  const btnCart = e.target.closest(".btnCart");
+
+  if (!btnCart) {
+    return;
+  } else {
+    const card = btnCart.closest(".card");
+    const img = card.querySelector(".card-img-top");
+    const title = card.querySelector(".card-title");
+    const price = card.querySelector(".card-text");
+    const book = {};
+    book.img = img.src;
+    book.title = title.innerText;
+    book.price = price.innerText;
+
+    cart.push(book);
+
+    dropdownMenu.innerHTML += `<li class="dropdown-item container bookCart">
+            <button type="button" class="btnDelete btn btn-danger"><i class="fa-solid fa-trash-can"></i></button>
+            <img style="width: 50px" src="${img.src}" alt="book_cover" />
+            ${title.innerText}
+          </li>`;
+
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(cart));
+  }
+});
+
+dropdownMenu.addEventListener("click", (e) => {
+  const btnDelete = e.target.closest(".btnDelete");
+
+  if (!btnDelete) {
+    return;
+  } else {
+    const card = btnDelete.closest(".bookCart");
     card.classList.add("d-none");
   }
 });
