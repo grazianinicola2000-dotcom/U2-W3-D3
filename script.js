@@ -117,5 +117,7 @@ dropdownMenu.addEventListener("click", (e) => {
   } else {
     const card = btnDelete.closest(".bookCart");
     card.classList.add("d-none");
+    cart.pop(card);
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(cart));
   }
 });
